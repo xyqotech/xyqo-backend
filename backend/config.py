@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     """Configuration de l'application"""
     
     # OpenAI
-    OPENAI_API_KEY: str
+    OPENAI_API_KEY: str = "placeholder"
     
     # Database
     DATABASE_URL: str = "postgresql://autopilot:autopilot@localhost:5432/autopilot_db"
@@ -21,9 +21,9 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
     
     # Jira
-    JIRA_URL: str
-    JIRA_EMAIL: str
-    JIRA_API_TOKEN: str
+    JIRA_URL: str = "https://demo.atlassian.net"
+    JIRA_EMAIL: str = "demo@example.com"
+    JIRA_API_TOKEN: str = "placeholder"
     JIRA_PROJECT_KEY: str = "DEMO"
     
     # Application
