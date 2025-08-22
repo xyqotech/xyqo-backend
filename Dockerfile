@@ -1,29 +1,19 @@
-FROM python:3.11-slim
+FROM node:18-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
-    g++ \
-    libpq-dev \
-    redis-tools \
-    && rm -rf /var/lib/apt/lists/*
+# Copy minimal files
+COPY package.json .
+COPY server.js .
 
-# Copy requirements and install Python dependencies
-COPY backend/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy backend code
-COPY backend/ .
-
-# Set environment variables
-ENV PYTHONPATH=/app
+# Environment
 ENV PORT=8000
+ENV NODE_ENV=production
 
-# Expose port
 EXPOSE $PORT
 
-# Run the application
-CMD uvicorn app:app --host 0.0.0.0 --port $PORT
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:$PORT/health || exit 1
+
+CMD ["npm", "start"]
