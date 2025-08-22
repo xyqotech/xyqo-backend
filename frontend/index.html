@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUTOPILOT - Dashboard Professionnel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8" x-data="autopilotDemo()">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="flex items-center justify-center mb-4">
+                <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-3 rounded-xl mr-4">
+                    <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">AUTOPILOT</h1>
+                    <p class="text-xl text-gray-600">Intelligence Artificielle pour l'Automatisation Contractuelle</p>
+                </div>
+            </div>
+            <div class="mt-4 flex justify-center space-x-4">
+                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                    API Status: <span x-text="apiStatus"></span>
+                </span>
+                <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">
+                    <span x-text="result?.demo_mode === false ? 'Production' : 'Démo'"></span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="max-w-2xl mx-auto mb-8">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-semibold mb-4">📄 Upload de Document</h2>
+                
+                <!-- File Upload -->
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center mb-4">
+                    <input type="file" 
+                           id="fileInput" 
+                           accept=".txt,.pdf,.docx"
+                           @change="handleFileSelect"
+                           class="hidden">
+                    <label for="fileInput" class="cursor-pointer">
+                        <div class="text-gray-400 mb-2">
+                            <svg class="mx-auto h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <p class="text-lg text-gray-600">Cliquez pour sélectionner un fichier</p>
+                        <p class="text-sm text-gray-400">PDF, DOCX, TXT (max 10MB)</p>
+                    </label>
+                </div>
+
+                <!-- Selected File -->
+                <div x-show="selectedFile" class="mb-4 p-3 bg-gray-50 rounded">
+                    <p class="text-sm text-gray-600">
+                        Fichier sélectionné: <span x-text="selectedFile?.name" class="font-medium"></span>
+                        (<span x-text="formatFileSize(selectedFile?.size)"></span>)
+                    </p>
+                </div>
+
+                <!-- Extract Button -->
+                <button @click="extractDocument" 
+                        :disabled="!selectedFile || loading"
+                        class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                    <span x-show="!loading">🤖 Extraire avec IA</span>
+                    <span x-show="loading" class="flex items-center justify-center">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Extraction en cours...
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div x-show="result" class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-semibold mb-4">📊 Résultats d'Extraction</h2>
+                
+                <!-- Session Info -->
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div>
+                            <span class="text-gray-500">Session ID:</span>
+                            <p class="font-mono" x-text="result?.session_id"></p>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">Temps de traitement:</span>
+                            <p x-text="result?.processing_time_ms + ' ms'"></p>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">Cache:</span>
+                            <p x-text="result?.cached ? 'Utilisé' : 'Nouveau'"></p>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">Confiance:</span>
+                            <p x-text="Math.round((result?.extraction?.confidence_score || 0) * 100) + '%'"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Extraction Details -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Left Column -->
+                    <div class="space-y-4">
+                        <div>
+                            <h3 class="font-semibold text-gray-700 mb-2">Type de Contrat</h3>
+                            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm" 
+                                  x-text="result?.extraction?.contract_type"></span>
+                        </div>
+
+                        <div>
+                            <h3 class="font-semibold text-gray-700 mb-2">Parties</h3>
+                            <div class="space-y-1">
+                                <template x-for="party in result?.extraction?.parties || []">
+                                    <div class="px-3 py-1 bg-green-100 text-green-800 rounded text-sm" x-text="party"></div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div x-show="result?.extraction?.amount">
+                            <h3 class="font-semibold text-gray-700 mb-2">Montant</h3>
+                            <p class="text-lg font-semibold text-green-600">
+                                <span x-text="formatAmount(result?.extraction?.amount)"></span>
+                                <span x-text="result?.extraction?.currency"></span>
+                            </p>
+                        </div>
+
+                        <div x-show="result?.extraction?.start_date || result?.extraction?.end_date">
+                            <h3 class="font-semibold text-gray-700 mb-2">Dates</h3>
+                            <div class="text-sm space-y-1">
+                                <p x-show="result?.extraction?.start_date">
+                                    <span class="text-gray-500">Début:</span> 
+                                    <span x-text="result?.extraction?.start_date"></span>
+                                </p>
+                                <p x-show="result?.extraction?.end_date">
+                                    <span class="text-gray-500">Fin:</span> 
+                                    <span x-text="result?.extraction?.end_date"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="space-y-4">
+                        <div>
+                            <h3 class="font-semibold text-gray-700 mb-2">Résumé</h3>
+                            <p class="text-sm text-gray-600 leading-relaxed" x-text="result?.extraction?.summary"></p>
+                        </div>
+
+                        <div x-show="result?.extraction?.key_terms?.length > 0">
+                            <h3 class="font-semibold text-gray-700 mb-2">Termes Clés</h3>
+                            <div class="flex flex-wrap gap-2">
+                                <template x-for="term in result?.extraction?.key_terms || []">
+                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs" x-text="term"></span>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div x-show="result?.jira_ticket">
+                            <h3 class="font-semibold text-gray-700 mb-2">Ticket Jira</h3>
+                            <div class="p-3 bg-blue-50 rounded">
+                                <p class="font-medium" x-text="result?.jira_ticket?.key"></p>
+                                <a :href="result?.jira_ticket?.url" target="_blank" 
+                                   class="text-blue-600 hover:underline text-sm">Voir le ticket →</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Display -->
+        <div x-show="error" class="max-w-2xl mx-auto mt-4">
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div class="flex">
+                    <div class="text-red-400">
+                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">Erreur</h3>
+                        <p class="mt-1 text-sm text-red-700" x-text="error"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="max-w-2xl mx-auto mt-8 text-center">
+            <div class="space-x-4">
+                <button @click="loadSample('contract_1.txt')" 
+                        class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm">
+                    📄 Tester Contrat Service
+                </button>
+                <button @click="loadSample('contract_2.txt')" 
+                        class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm">
+                    🛒 Tester Bon de Commande
+                </button>
+                <a href="http://localhost:8000/docs" target="_blank"
+                   class="px-4 py-2 bg-blue-100 hover:bg-blue-200 rounded-lg text-sm">
+                    📚 API Docs
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function autopilotDemo() {
+            return {
+                selectedFile: null,
+                loading: false,
+                result: null,
+                error: null,
+                apiStatus: 'Checking...',
+
+                init() {
+                    this.checkApiStatus();
+                },
+
+                async checkApiStatus() {
+                    try {
+                        const response = await fetch('http://localhost:8000/api/v1/health');
+                        if (response.ok) {
+                            this.apiStatus = 'Online';
+                        } else {
+                            this.apiStatus = 'Error';
+                        }
+                    } catch (e) {
+                        this.apiStatus = 'Offline';
+                    }
+                },
+
+                handleFileSelect(event) {
+                    this.selectedFile = event.target.files[0];
+                    this.result = null;
+                    this.error = null;
+                },
+
+                async extractDocument() {
+                    if (!this.selectedFile) return;
+
+                    this.loading = true;
+                    this.error = null;
+                    this.result = null;
+
+                    try {
+                        const formData = new FormData();
+                        formData.append('file', this.selectedFile);
+
+                        const response = await fetch('http://localhost:8000/api/v1/extract', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.detail || 'Erreur d\'extraction');
+                        }
+
+                        this.result = await response.json();
+                    } catch (e) {
+                        this.error = e.message;
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async loadSample(filename) {
+                    try {
+                        const response = await fetch(`/Users/bassiroudiop/autopilot-demo/data/samples/${filename}`);
+                        const content = await response.text();
+                        
+                        // Create a File object from the content
+                        const file = new File([content], filename, { type: 'text/plain' });
+                        this.selectedFile = file;
+                        
+                        // Auto-extract
+                        await this.extractDocument();
+                    } catch (e) {
+                        this.error = `Impossible de charger ${filename}`;
+                    }
+                },
+
+                formatFileSize(bytes) {
+                    if (!bytes) return '0 B';
+                    const k = 1024;
+                    const sizes = ['B', 'KB', 'MB', 'GB'];
+                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+                    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+                },
+
+                formatAmount(amount) {
+                    if (!amount) return '';
+                    return new Intl.NumberFormat('fr-FR').format(amount);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
