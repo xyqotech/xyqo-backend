@@ -1,0 +1,325 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "UniversalContractV3",
+  "type": "object",
+  "required": ["meta","parties","contract","financials","governance","summary_plain","risks_red_flags","missing_info","operational_actions"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["generator","version","language","generated_at","locale_guess","source_doc_info"],
+      "properties": {
+        "generator": { "type": "string", "enum": ["ContractSummarizer"] },
+        "version": { "type": "string", "enum": ["3.0"] },
+        "language": { "type": "string", "enum": ["fr"] },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "locale_guess": { "type": "string", "nullable": true },
+        "source_doc_info": {
+          "type": "object",
+          "required": ["title","doc_type","signing_method","signatures_present"],
+          "properties": {
+            "title": { "type": "string", "nullable": true },
+            "doc_type": { "type": "string", "nullable": true },
+            "signing_method": { "type": "string", "nullable": true },
+            "signatures_present": { "type": "boolean" },
+            "version_label": { "type": "string", "nullable": true },
+            "effective_date": { "type": "string", "format": "date", "nullable": true }
+          }
+        }
+      }
+    },
+    "parties": {
+      "type": "object",
+      "required": ["list"],
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name","role"],
+            "properties": {
+              "name": { "type": "string", "nullable": true },
+              "role": { "type": "string", "nullable": true },
+              "legal_form": { "type": "string", "nullable": true },
+              "siren_siret": { "type": "string", "nullable": true },
+              "address": { "type": "string", "nullable": true },
+              "representative": { "type": "string", "nullable": true },
+              "contact_masked": { "type": "string", "nullable": true }
+            }
+          }
+        },
+        "third_parties": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "contract": {
+      "type": "object",
+      "required": ["object","scope","location_or_site","dates","obligations","service_levels","ip_rights","data_privacy"],
+      "properties": {
+        "object": { "type": "string", "nullable": true },
+        "scope": {
+          "type": "object",
+          "properties": {
+            "deliverables": { "type": "array", "items": { "type": "string" } },
+            "exclusions": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "location_or_site": { "type": "string", "nullable": true },
+        "dates": {
+          "type": "object",
+          "required": ["start_date","end_date","minimum_term_months","renewal","notice_period_days"],
+          "properties": {
+            "start_date": { "type": "string", "format": "date", "nullable": true },
+            "end_date": { "type": "string", "format": "date", "nullable": true },
+            "minimum_term_months": { "type": "integer", "nullable": true },
+            "renewal": { "type": "string", "nullable": true },
+            "notice_period_days": { "type": "integer", "nullable": true },
+            "milestones": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "label": { "type": "string" },
+                  "date": { "type": "string", "format": "date", "nullable": true }
+                }
+              }
+            }
+          }
+        },
+        "obligations": {
+          "type": "object",
+          "properties": {
+            "by_provider": { "type": "array", "items": { "type": "string" } },
+            "by_customer": { "type": "array", "items": { "type": "string" } },
+            "by_other": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "service_levels": {
+          "type": "object",
+          "properties": {
+            "kpi_list": { "type": "array", "items": { "type": "string" } },
+            "sla": { "type": "string", "nullable": true },
+            "penalties": { "type": "string", "nullable": true }
+          }
+        },
+        "ip_rights": {
+          "type": "object",
+          "properties": { 
+            "ownership": { "type": "string", "nullable": true }, 
+            "license_terms": { "type": "string", "nullable": true } 
+          }
+        },
+        "data_privacy": {
+          "type": "object",
+          "properties": {
+            "rgpd": { "type": "boolean", "nullable": true },
+            "processing_roles": { "type": "string", "nullable": true },
+            "subprocessors": { "type": "array", "items": { "type": "string" } },
+            "data_locations": { "type": "array", "items": { "type": "string" } },
+            "security_measures": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "financials": {
+      "type": "object",
+      "required": ["price_model","items","currency","payment_terms"],
+      "properties": {
+        "price_model": { "type": "string", "enum": ["forfait","abonnement","à_l_acte","mixte","inconnu"], "nullable": true },
+        "items": {
+          "type": "array",
+          "items": { 
+            "type": "object", 
+            "properties": {
+              "label": { "type": "string" },
+              "amount": { "type": "number", "nullable": true },
+              "currency": { "type": "string", "nullable": true },
+              "period": { "type": "string", "enum": ["unique","mensuel","trimestriel","annuel","inconnu"], "nullable": true }
+            } 
+          }
+        },
+        "currency": { "type": "string", "nullable": true },
+        "payment_terms": { "type": "string", "nullable": true },
+        "late_fees": { "type": "string", "nullable": true },
+        "indexation": { "type": "string", "nullable": true },
+        "security_deposit": {
+          "type": "object",
+          "properties": {
+            "amount": { "type": "number", "nullable": true },
+            "currency": { "type": "string", "nullable": true },
+            "refund_terms": { "type": "string", "nullable": true }
+          }
+        },
+        "credit_details": {
+          "type": "object",
+          "properties": {
+            "principal_amount": { "type": "number", "nullable": true },
+            "currency": { "type": "string", "nullable": true },
+            "taeg_percent": { "type": "number", "nullable": true },
+            "interest_rate_percent": { "type": "number", "nullable": true },
+            "repayment_schedule": {
+              "type": "array",
+              "items": { 
+                "type": "object", 
+                "properties": {
+                  "amount": { "type": "number", "nullable": true },
+                  "currency": { "type": "string", "nullable": true },
+                  "due_date": { "type": "string", "format": "date", "nullable": true }
+                } 
+              }
+            },
+            "withdrawal_rights": {
+              "type": "object",
+              "properties": { 
+                "days": { "type": "integer", "nullable": true }, 
+                "instructions": { "type": "string", "nullable": true } 
+              }
+            }
+          }
+        }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "required": ["termination","liability","warranties","compliance","law","jurisdiction","confidentiality","force_majeure"],
+      "properties": {
+        "termination": {
+          "type": "object",
+          "properties": {
+            "by_provider": { "type": "string", "nullable": true },
+            "by_customer": { "type": "string", "nullable": true },
+            "effects": { "type": "string", "nullable": true }
+          }
+        },
+        "liability": { "type": "string", "nullable": true },
+        "warranties": { "type": "string", "nullable": true },
+        "compliance": { "type": "string", "nullable": true },
+        "law": { "type": "string", "nullable": true },
+        "jurisdiction": { "type": "string", "nullable": true },
+        "insurance": { "type": "string", "nullable": true },
+        "confidentiality": { "type": "boolean", "nullable": true },
+        "force_majeure": { "type": "boolean", "nullable": true },
+        "non_compete": {
+          "type": "object",
+          "properties": {
+            "exists": { "type": "boolean", "nullable": true },
+            "duration_months": { "type": "integer", "nullable": true },
+            "scope": { "type": "string", "nullable": true },
+            "consideration_amount": { "type": "number", "nullable": true },
+            "currency": { "type": "string", "nullable": true }
+          }
+        }
+      }
+    },
+    "assurances": {
+      "type": "object",
+      "properties": {
+        "policies": {
+          "type": "array",
+          "items": { 
+            "type": "object", 
+            "properties": {
+              "type": { "type": "string", "enum": ["rc_pro","dommages_ouvrage","decennale","assurance_emprunteur","autre"], "nullable": true },
+              "provider": { "type": "string", "nullable": true },
+              "policy_number": { "type": "string", "nullable": true },
+              "coverage": { "type": "string", "nullable": true },
+              "start_date": { "type": "string", "format": "date", "nullable": true },
+              "end_date": { "type": "string", "format": "date", "nullable": true }
+            } 
+          }
+        }
+      }
+    },
+    "conditions_suspensives": {
+      "type": "array",
+      "items": { 
+        "type": "object", 
+        "properties": {
+          "label": { "type": "string" },
+          "description": { "type": "string", "nullable": true },
+          "deadline_date": { "type": "string", "format": "date", "nullable": true },
+          "satisfied": { "type": "boolean", "nullable": true }
+        } 
+      }
+    },
+    "employment_details": {
+      "type": "object",
+      "properties": {
+        "contract_type": { "type": "string", "enum": ["CDI","CDD","Portage","Interim","Autre"], "nullable": true },
+        "position_title": { "type": "string", "nullable": true },
+        "qualification": { "type": "string", "nullable": true },
+        "collective_agreement": { "type": "string", "nullable": true },
+        "probation_period": { 
+          "type": "object", 
+          "properties": {
+            "months": { "type": "integer", "nullable": true }
+          } 
+        },
+        "working_time": { 
+          "type": "object", 
+          "properties": {
+            "type": { "type": "string", "enum": ["heures","forfait_jours"], "nullable": true },
+            "hours_per_week": { "type": "number", "nullable": true },
+            "days_per_year": { "type": "integer", "nullable": true }
+          } 
+        },
+        "remuneration": { 
+          "type": "object", 
+          "properties": {
+            "base_amount": { "type": "number", "nullable": true },
+            "currency": { "type": "string", "nullable": true },
+            "periodicity": { "type": "string", "enum": ["horaire","journalier","mensuel","annuel"], "nullable": true },
+            "variable": { "type": "string", "nullable": true },
+            "minimum_guarantee": { "type": "number", "nullable": true }
+          } 
+        },
+        "paid_leave_days_per_year": { "type": "number", "nullable": true },
+        "notice_period": { "type": "string", "nullable": true },
+        "mobility_clause": { "type": "boolean", "nullable": true }
+      }
+    },
+    "immobilier_specifics": {
+      "type": "object",
+      "properties": {
+        "property_type": { "type": "string", "enum": ["habitation","commercial","terrain","vefa","autre"], "nullable": true },
+        "address": { "type": "string", "nullable": true },
+        "surface_sqm": { "type": "number", "nullable": true },
+        "rooms": { "type": "integer", "nullable": true },
+        "lot_description": { "type": "string", "nullable": true },
+        "diagnostics": { "type": "array", "items": { "type": "string" } },
+        "charges_breakdown": { "type": "string", "nullable": true },
+        "works_done": { "type": "string", "nullable": true },
+        "retraction_rights": { 
+          "type": "object", 
+          "properties": {
+            "days": { "type": "integer", "nullable": true }
+          } 
+        },
+        "delivery": { 
+          "type": "object", 
+          "properties": {
+            "deadline_date": { "type": "string", "format": "date", "nullable": true },
+            "penalties": { "type": "string", "nullable": true }
+          } 
+        }
+      }
+    },
+    "litiges_modes_alternatifs": {
+      "type": "object",
+      "properties": {
+        "mediation": { "type": "string", "nullable": true },
+        "arbitration": { "type": "string", "nullable": true },
+        "amicable_settlement_steps": { "type": "string", "nullable": true }
+      }
+    },
+    "summary_plain": { "type": "string" },
+    "risks_red_flags": { "type": "array", "items": { "type": "string" } },
+    "missing_info": { "type": "array", "items": { "type": "string" } },
+    "operational_actions": {
+      "type": "object",
+      "properties": {
+        "jira_summary": { "type": "string", "nullable": true },
+        "key_dates": { "type": "array", "items": { "type": "string", "format": "date" } },
+        "renewal_window_days": { "type": "integer", "nullable": true }
+      }
+    }
+  }
+}
