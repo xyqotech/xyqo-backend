@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: xyqo-backend
+    env: python
+    plan: starter
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: PYTHONUNBUFFERED
+        value: 1
+      - key: PORT
+        value: 8000
+    healthCheckPath: /health
+    disk:
+      name: xyqo-backend-disk
+      size: 1GB
+      mount: /tmp
+    scaling:
+      minInstances: 1
+      maxInstances: 3
+    region: oregon
