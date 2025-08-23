@@ -45,9 +45,15 @@ app = FastAPI(
 )
 
 # CORS configuration - CRITICAL: Only allow Vercel domain
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "*")
+if allowed_origins != "*":
+    allowed_origins = [origin.strip() for origin in allowed_origins.split(",")]
+else:
+    allowed_origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[os.getenv("ALLOWED_ORIGINS", "*")],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
