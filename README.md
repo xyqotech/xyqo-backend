@@ -96,3 +96,4 @@ autopilot-demo/
 ---
 
 Développé pour démontrer l'automatisation IA des processus métier.
+# Force Render redeploy - CORS fix
