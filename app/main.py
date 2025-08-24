@@ -210,7 +210,7 @@ def generate_pdf_report(analysis: Dict[str, Any], processing_id: str, filename: 
     story = []
     
     # Title - FORCE UPDATE FOR PRODUCTION
-    story.append(Paragraph("RÉSUMÉ DE CONTRAT XYQO v2.0", title_style))
+    story.append(Paragraph("RÉSUMÉ DE CONTRAT XYQO v3.1", title_style))
     story.append(Spacer(1, 12))
     
     # Document info
