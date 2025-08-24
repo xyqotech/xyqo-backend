@@ -15,6 +15,10 @@ import sys
 import re
 import uuid
 import traceback
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # OpenAI integration
 try:

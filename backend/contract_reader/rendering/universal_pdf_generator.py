@@ -445,21 +445,45 @@ class UniversalPDFGenerator:
         """
     
     def _generate_executive_summary(self, summary_plain: str) -> str:
-        """Génère le résumé exécutif"""
+        """Génère le résumé exécutif structuré avec 9 rubriques universelles"""
         if not summary_plain:
             summary_plain = "Aucun résumé disponible."
+        
+        # Formatage du résumé en paragraphes structurés
+        formatted_summary = self._format_structured_summary(summary_plain)
         
         return f"""
         <div class="section">
             <h2 class="section-title">
                 <span class="section-icon">📋</span>
-                Résumé Exécutif
+                Résumé Exécutif Board-Ready V2.3
             </h2>
             <div class="summary-box">
-                <div class="summary-text">{summary_plain}</div>
+                <div class="summary-text">{formatted_summary}</div>
             </div>
         </div>
         """
+    
+    def _format_structured_summary(self, summary_plain: str) -> str:
+        """Formate le résumé avec structure lisible et paragraphes"""
+        if not summary_plain:
+            return "Aucun résumé disponible."
+        
+        # Divise le texte en lignes et regroupe par paragraphes logiques
+        lines = [line.strip() for line in summary_plain.split('\n') if line.strip()]
+        
+        # Structure en paragraphes avec espacement
+        formatted_lines = []
+        for i, line in enumerate(lines):
+            # Ajoute un espacement après certaines sections clés
+            if any(keyword in line.lower() for keyword in ['nature et objet', 'parties et rôles', 'durée et renouvellement', 'obligations principales', 'aspects financiers', 'risques identifiés', 'clauses rgpd', 'gouvernance juridique', 'points d\'attention']):
+                if i > 0:
+                    formatted_lines.append('<br>')
+                formatted_lines.append(f'<strong>{line}</strong>')
+            else:
+                formatted_lines.append(line)
+        
+        return '<br>'.join(formatted_lines)
     
     def _generate_parties_section(self, parties: Dict[str, Any]) -> str:
         """Génère la section des parties contractantes"""

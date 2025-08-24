@@ -373,7 +373,7 @@ Analyse intégrale du document et production d'un JSON STRICT conforme au schém
       }}
     }},
 
-    "summary_plain": {{ "type": "string" }},
+    "summary_plain": {{ "type": "string", "description": "Résumé structuré 14-22 lignes avec 9 rubriques universelles adaptées par famille de contrat" }},
     "risks_red_flags": {{ "type": "array", "items": {{ "type": "string" }} }},
     "missing_info": {{ "type": "array", "items": {{ "type": "string" }} }},
 
@@ -419,7 +419,7 @@ Analyse intégrale du document et production d'un JSON STRICT conforme au schém
 - "data_privacy": RGPD obligatoire si données personnelles, rôles de traitement, mesures de sécurité.
 - "governance": Droit applicable, juridiction, résiliation, responsabilité, assurances, force majeure.
 - "financials": Montants, devises, modalités. Utilise les données pré-extraites ci-dessous.
-- "summary_plain": 12–25 lignes, français simple et factuel (aucun copier‑coller).
+- "summary_plain": 14–22 lignes, français simple et factuel, structuré par famille de contrat avec 9 rubriques universelles : 1) Nature et objet, 2) Parties et rôles, 3) Durée et renouvellement, 4) Obligations principales, 5) Aspects financiers, 6) Risques identifiés, 7) Clauses RGPD/données, 8) Gouvernance juridique, 9) Points d'attention. Adaptatif selon la famille (SaaS/SLA, Bail/indexation, Emploi/rémunération, etc.). Fallback "non précisé" si données manquantes.
 - "risks_red_flags": Points d'attention juridiques/financiers/opérationnels/techniques.
 - "missing_info": Ce qui manque pour une analyse complète.
 - Renseigne les blocs spécifiques (employment_details, immobilier_specifics, credit_details, assurances, conditions_suspensives, non_compete, litiges_modes_alternatifs) uniquement s'ils sont présents.
