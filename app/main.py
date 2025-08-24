@@ -173,7 +173,7 @@ SCHÉMA JSON REQUIS :
         logger.error(f"OpenAI analysis error: {e}")
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
 
-def generate_pdf_report(analysis: Dict[str, Any], processing_id: str) -> bytes:
+def generate_pdf_report(analysis: Dict[str, Any], processing_id: str, filename: str = "contrat.pdf") -> bytes:
     """Generate professional PDF report using ReportLab"""
     
     buffer = BytesIO()
@@ -326,7 +326,7 @@ async def analyze_contract(file: UploadFile = File(...)):
         processing_id = hashlib.sha256(content).hexdigest()[:16]
         
         # Generate PDF report
-        pdf_bytes = generate_pdf_report(analysis, processing_id)
+        pdf_bytes = generate_pdf_report(analysis, processing_id, file.filename)
         
         # Cache both analysis and PDF
         analysis_cache[processing_id] = analysis
