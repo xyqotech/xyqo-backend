@@ -1,0 +1,56 @@
+{
+  "success": true,
+  "analysis": {
+    "executive_summary": "Analyse automatique basique - OpenAI non disponible",
+    "parties": [
+      {
+        "name": "Partie non identifiée",
+        "role": "CLIENT",
+        "legal_form": null,
+        "siren_siret": null,
+        "address": null,
+        "representative": null
+      }
+    ],
+    "details": {
+      "object": "Objet du contrat non analysé",
+      "location": null,
+      "start_date": null,
+      "end_date": null,
+      "minimum_duration": null,
+      "notice_period": null
+    },
+    "obligations": {
+      "provider": [
+        "Obligations non analysées"
+      ],
+      "client": [
+        "Obligations non analysées"
+      ]
+    },
+    "financials": {
+      "pricing_model": "inconnu",
+      "payment_terms": null,
+      "amounts": []
+    },
+    "governance": {
+      "applicable_law": null,
+      "jurisdiction": null,
+      "liability": null,
+      "confidentiality": null
+    },
+    "risks": [
+      "Analyse IA non disponible - vérification manuelle recommandée"
+    ],
+    "missing_info": [
+      "Toutes les informations - analyse automatique limitée"
+    ],
+    "legal_warning": "Ce résumé automatique ne constitue pas un conseil juridique et peut comporter des erreurs. Une analyse par un professionnel du droit est recommandée."
+  },
+  "metadata": {
+    "filename": "test_real_pdf.pdf",
+    "analysis_id": "03ef4b22-5c5f-42a8-a44e-5e4db5e07bb5",
+    "download_url": "/download/03ef4b22-5c5f-42a8-a44e-5e4db5e07bb5.pdf",
+    "processed_at": "2025-08-24T13:39:00.212321"
+  }
+}

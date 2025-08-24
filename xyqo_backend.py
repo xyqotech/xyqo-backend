@@ -64,9 +64,18 @@ class XYQOHandler(BaseHTTPRequestHandler):
     
     def _send_cors_headers(self):
         """Send CORS headers"""
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        allowed_origins = os.getenv('ALLOWED_ORIGINS', 'http://localhost:3000,http://localhost:3001,http://localhost:3002').split(',')
+        origin = self.headers.get('Origin', '')
+        
+        if origin in allowed_origins or '*' in allowed_origins:
+            self.send_header('Access-Control-Allow-Origin', origin or '*')
+        else:
+            self.send_header('Access-Control-Allow-Origin', 'http://localhost:3001')
+            
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
+        self.send_header('Access-Control-Allow-Credentials', 'true')
+        self.send_header('Access-Control-Max-Age', '86400')
     
     def _send_health_check(self):
         """Send health check response"""
