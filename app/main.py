@@ -210,55 +210,72 @@ def generate_pdf_report(analysis: Dict[str, Any], processing_id: str) -> bytes:
     story = []
     
     # Title
-    story.append(Paragraph("RAPPORT D'ANALYSE CONTRACTUELLE", title_style))
+    story.append(Paragraph("RÉSUMÉ DE CONTRAT XYQO", title_style))
+    story.append(Spacer(1, 12))
+    
+    # Document info
+    story.append(Paragraph(f"<b>Document:</b> {filename}", body_style))
+    story.append(Paragraph(f"<b>Généré le:</b> {datetime.now().strftime('%d/%m/%Y à %H:%M')}", body_style))
     story.append(Spacer(1, 20))
     
-    # Executive Summary
-    story.append(Paragraph("RÉSUMÉ EXÉCUTIF", heading_style))
-    story.append(Paragraph(analysis.get('executive_summary', 'Non disponible'), body_style))
-    story.append(Spacer(1, 12))
+    # Contract object
+    contract_object = analysis.get('details', {}).get('object', 'Non spécifié')
+    story.append(Paragraph("OBJET DU CONTRAT", heading_style))
+    story.append(Paragraph(contract_object, body_style))
+    story.append(Spacer(1, 15))
     
     # Parties
-    story.append(Paragraph("PARTIES CONTRACTUELLES", heading_style))
-    for party in analysis.get('parties', []):
-        party_text = f"<b>{party.get('role', 'N/A')}</b>: {party.get('name', 'N/A')}"
-        if party.get('legal_form'):
-            party_text += f" ({party['legal_form']})"
-        story.append(Paragraph(party_text, body_style))
-    story.append(Spacer(1, 12))
+    story.append(Paragraph("PARTIES", heading_style))
+    parties = analysis.get('parties', [])
+    if parties:
+        for party in parties:
+            if party.get('name'):
+                party_info = f"<b>{party['name']}</b> ({party.get('role', 'Rôle non spécifié')})"
+                if party.get('address'):
+                    party_info += f"<br/>{party['address']}"
+                if party.get('siren_siret'):
+                    party_info += f"<br/>SIREN/SIRET: {party['siren_siret']}"
+                story.append(Paragraph(party_info, body_style))
+                story.append(Spacer(1, 8))
+    else:
+        story.append(Paragraph("Aucune partie identifiée", body_style))
+    story.append(Spacer(1, 15))
     
-    # Contract Details
-    details = analysis.get('details', {})
-    story.append(Paragraph("DÉTAILS DU CONTRAT", heading_style))
-    story.append(Paragraph(f"<b>Objet:</b> {details.get('object', 'Non spécifié')}", body_style))
-    if details.get('start_date'):
-        story.append(Paragraph(f"<b>Date de début:</b> {details['start_date']}", body_style))
-    if details.get('end_date'):
-        story.append(Paragraph(f"<b>Date de fin:</b> {details['end_date']}", body_style))
-    story.append(Spacer(1, 12))
+    # Executive summary
+    story.append(Paragraph("RÉSUMÉ EXÉCUTIF", heading_style))
+    summary = analysis.get('executive_summary', 'Aucun résumé disponible')
+    story.append(Paragraph(summary, body_style))
+    story.append(Spacer(1, 15))
     
-    # Financials
-    financials = analysis.get('financials', {})
-    if financials.get('pricing_model') or financials.get('amounts'):
-        story.append(Paragraph("ASPECTS FINANCIERS", heading_style))
-        if financials.get('pricing_model'):
-            story.append(Paragraph(f"<b>Modèle tarifaire:</b> {financials['pricing_model']}", body_style))
-        for amount in financials.get('amounts', []):
-            if amount.get('amount') and amount.get('currency'):
-                story.append(Paragraph(f"<b>{amount.get('type', 'Montant')}:</b> {amount['amount']} {amount['currency']}", body_style))
-        story.append(Spacer(1, 12))
+    # Obligations
+    obligations = analysis.get('obligations', {})
+    if obligations.get('provider') or obligations.get('client'):
+        story.append(Paragraph("OBLIGATIONS", heading_style))
+        
+        if obligations.get('provider'):
+            story.append(Paragraph("<b>Obligations du prestataire:</b>", body_style))
+            for obligation in obligations['provider']:
+                story.append(Paragraph(f"• {obligation}", body_style))
+            story.append(Spacer(1, 8))
+        
+        if obligations.get('client'):
+            story.append(Paragraph("<b>Obligations du client:</b>", body_style))
+            for obligation in obligations['client']:
+                story.append(Paragraph(f"• {obligation}", body_style))
+        story.append(Spacer(1, 15))
     
     # Risks
+    story.append(Paragraph("RISQUES ET ALERTES", heading_style))
     risks = analysis.get('risks', [])
     if risks:
-        story.append(Paragraph("FACTEURS DE RISQUE", heading_style))
         for risk in risks:
-            story.append(Paragraph(f"• {risk}", body_style))
-        story.append(Spacer(1, 12))
+            story.append(Paragraph(f"⚠️ {risk}", body_style))
+            story.append(Spacer(1, 4))
+    else:
+        story.append(Paragraph("Aucun risque identifié", body_style))
     
-    # Legal Warning
-    story.append(Paragraph("AVERTISSEMENT JURIDIQUE", heading_style))
-    story.append(Paragraph(analysis.get('legal_warning', 'Cette analyse est fournie à titre informatif uniquement.'), body_style))
+    story.append(Spacer(1, 30))
+    story.append(Paragraph("Généré par XYQO Contract Analyzer v3.0", body_style))
     
     # Build PDF
     doc.build(story)
