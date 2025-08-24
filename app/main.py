@@ -275,7 +275,7 @@ def generate_pdf_report(analysis: Dict[str, Any], processing_id: str, filename: 
         story.append(Paragraph("Aucun risque identifié", body_style))
     
     story.append(Spacer(1, 30))
-    story.append(Paragraph("Généré par XYQO Contract Analyzer v3.0", body_style))
+    story.append(Paragraph("Généré par XYQO Contract Analyzer v3.1 - FORCE UPDATE", body_style))
     
     # Build PDF
     doc.build(story)
